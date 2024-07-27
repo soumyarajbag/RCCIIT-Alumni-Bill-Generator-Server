@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from email.mime.text import MIMEText
+from flask_cors import CORS
 from email.mime.multipart import MIMEMultipart
 import smtplib
 from dotenv import load_dotenv
@@ -7,10 +8,11 @@ import os
 from bill_gen import bill_gen
 
 app = Flask(__name__)
+CORS(app)
 load_dotenv()
 
 # Set up the email parameters
-sender = "rcciit.regalia.official@gmail.com"
+sender = "alumniassociationrcciit@gmail.com"
 subject = "RCCIIT Alumni - Bill Details"
 
 app_password = os.getenv("APP_PASSWORD")
@@ -24,20 +26,18 @@ def home():
 def generate_pass():
     try:
         data = request.json
-        print(data)
         bill_no = data.get('bill_no')
         name = data.get('name')
         stream = data.get('stream')
         college_id = data.get('college_id')
         email = data.get('email')
         phone = data.get('phone')
-        mode = data.get('mode')
-        status = data.get('status')
+        mode = data.get('payment_mode')
+        status = 'PAID'
         transaction_id = data.get('transaction_id')
         note = data.get('note')
         receiver = data.get('receiver')
         date = data.get('date')
-        print(data)
 
         # Generate HTML content for the bill
         html_content = bill_gen(bill_no, name, stream, college_id, email, phone, mode, status, transaction_id, note, receiver, date)
