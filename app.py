@@ -20,7 +20,7 @@ cc_email = "alma.connect@rcciit.org.in"
 
 @app.route('/')
 def home():
-    return jsonify({"message": "Welcome to the Regalia 2024 Pass Generator"}), 200
+    return jsonify({"message": "Welcome to the Alumni Bill Generator"}), 200
 
 @app.route('/generate-bill', methods=['POST'])
 def generate_pass():
