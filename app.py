@@ -11,12 +11,12 @@ app = Flask(__name__)
 CORS(app)
 load_dotenv()
 
-# Set up the email parameters
 sender = "alumniassociationrcciit@gmail.com"
 subject = "RCCIIT Alumni - Bill Details"
 
 app_password = os.getenv("APP_PASSWORD")
 sender_email = os.getenv("SENDER_EMAIL")
+cc_email = "alma.connect@rcciit.org.in"  
 
 @app.route('/')
 def home():
@@ -39,24 +39,27 @@ def generate_pass():
         receiver = data.get('receiver')
         date = data.get('date')
 
-        # Generate HTML content for the bill
+
         html_content = bill_gen(bill_no, name, stream, college_id, email, phone, mode, status, transaction_id, note, receiver, date)
 
-        # Create email message
+
         msg = MIMEMultipart()
         msg["From"] = sender
         msg["To"] = email
-        msg["Subject"] = name.upper() + ' - ' + subject
+        msg["Cc"] = cc_email
+        msg["Subject"] = f"{name.upper()} - {subject}"
 
-        # Attach email content
+
         msg.attach(MIMEText(html_content, "html"))
 
-        # Log in to the SMTP server and send the email
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        server.login(sender, app_password)
-        server.sendmail(sender, email, msg.as_string())
-        server.quit()
+
+        to_addresses = [email] + [cc_email]
+
+
+        with smtplib.SMTP('smtp.gmail.com', 587) as server:
+            server.starttls()
+            server.login(sender, app_password)
+            server.sendmail(sender, to_addresses, msg.as_string())
 
         return jsonify({
             "message": "Bill generated and email sent successfully",
